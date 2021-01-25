@@ -36,7 +36,7 @@ function Get-ComputerByHostname {
         }
     }
 
-    Write-Warning "Unknown hostname."
+    Write-Warning 'Unknown hostname.'
 }
 
 function Get-PSSessionByComputer {
@@ -47,11 +47,20 @@ function Get-PSSessionByComputer {
         $Computer 
     )
 
+    $Session = $null
+
     if ($null -eq $Computer.Session) {
-        $Computer.Session = New-PSSession $Computer.Hostname -UseSSL -Credential $Computer.Credential 
+        $SessionOption = New-PSSessionOption -OpenTimeout 1
+        $Session = New-PSSession $Computer.Hostname -UseSSL -Credential $Computer.Credential -SessionOption $SessionOption -ErrorAction SilentlyContinue 
     }
 
-    return $Computer.Session
+    if ($Session) {
+        $Computer.Session = $Session
+    } else {
+        Write-Warning "Couldn't create PowerShell Session for $Computer."
+    }
+
+    return $Session
 }
 
 function Get-PSSessionByHostname {
@@ -68,7 +77,7 @@ function Get-PSSessionByHostname {
         return Get-PSSessionByComputer $c
     }
 
-    Write-Warning "Unknown hostname."
+    Write-Warning 'Unknown hostname.'
 }
 
 function Enter-PSSessionByHostname {

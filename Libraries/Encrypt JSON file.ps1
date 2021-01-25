@@ -10,10 +10,10 @@ try {
 $CurrentLine = '';
 $Lines = @();
 
-Write-Host "Paste your JSON array here"
+Write-Host 'Paste your JSON array here'
 
-while ($CurrentLine -ne "]") {
-    $CurrentLine = Read-Host ">"
+while ($CurrentLine -ne ']') {
+    $CurrentLine = Read-Host '>'
     $Lines += $CurrentLine
 }
 

@@ -23,8 +23,6 @@ foreach ($c in $Computers) {
     $Session = Get-PSSessionByComputer $c
     if ($Session) {
         Invoke-Command -Session $Session { Write-Host "Hello, world! My name is $env:COMPUTERNAME." }
-    } else {
-        Write-Warning "Couldn't create PowerShell Session for $c."
     }
 
     Send a local file to computer:
