@@ -7,8 +7,8 @@ try {
     exit
 }
 
-$CurrentLine = '';
-$Lines = @();
+$CurrentLine = ''
+$Lines = @()
 
 Write-Host 'Paste your JSON array here'
 

@@ -104,6 +104,8 @@ function New-EncryptedJsonFile {
         $File 
     )
 
+    $Path = 'Computers.json'
+
     try {
         $Json = $File | ConvertFrom-Json
 
@@ -113,11 +115,13 @@ function New-EncryptedJsonFile {
             $Object.Password = $Object.Password | ConvertTo-SecureString -AsPlainText | ConvertFrom-SecureString
         }
     
-        $Json | ConvertTo-Json | Set-Content ./Computers.json
+        $Json | ConvertTo-Json | Set-Content $Path
     
-        $File = Get-ChildItem ./Computers.json -Force
-        $File | ForEach-Object { $_.Attributes += 'Hidden' }
-        Write-Host ("JSON array encrypted successfully at: {0}" -f $File.FullName)
+        $Properties = (Get-ItemProperty $Path)
+        if (! ($Properties.Attributes -band [IO.FileAttributes]::Hidden)) {
+            $Properties.Attributes += [IO.FileAttributes]::Hidden
+        }
+        Write-Host ('Encrypted computer list saved to {0}' -f $Properties.FullName)
     } catch {
         Write-Warning 'An error occured while encrypting the JSON. Please check the syntax and try again.'
     }
