@@ -9,10 +9,16 @@ try {
 # Enter a PowerShell Session
 # Enter-PSSessionByHostname DeviceName
 
-# Run something on every computer, except ignored ones.
-$IgnoredComputers = @() # Add hostnames here
+# Run something on all computers
+$IncludedComputers = $Computers
 
-foreach ($c in $Computers) {
+# Run something on all computers in a group
+# $IncludedComputers = Get-ComputersInGroup Group1
+
+# Ignore computers by hostname ones.
+# $IgnoredComputers = @() # Add hostnames here
+
+foreach ($c in $IncludedComputers) {
     if ($IgnoredComputers -contains $c.Hostname) {
         continue
     }
