@@ -15,8 +15,8 @@ $IncludedComputers = $Computers
 # Run something on all computers in a group
 # $IncludedComputers = Get-ComputersInGroup Group1
 
-# Ignore computers by hostname ones.
-# $IgnoredComputers = @() # Add hostnames here
+# Ignore computers by hostname.
+# $IgnoredComputers = @()
 
 foreach ($c in $IncludedComputers) {
     if ($IgnoredComputers -contains $c.Hostname) {
