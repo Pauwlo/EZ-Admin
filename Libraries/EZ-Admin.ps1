@@ -5,20 +5,23 @@ class Computer {
     [string]$Hostname
     [string]$Username
     [System.Management.Automation.PSCredential]$Credential
+    [string]$Group
     [Object]$Session
 
     Computer (
         [string]$hostname,
         [string]$username,
-        [System.Management.Automation.PSCredential]$credential
+        [System.Management.Automation.PSCredential]$credential,
+        [string]$group
     ) {
         $this.Hostname = $hostname
         $this.Username = $username
         $this.Credential = $credential
+        $this.Group = $group
     }
 
     [string]ToString() {
-        return ("{0}\{1}" -f $this.Hostname, $this.Username)
+        return ("{0}\{1} ({2})" -f $this.Hostname, $this.Username, $this.Group)
     }
 }
 
@@ -113,6 +116,7 @@ function New-EncryptedJsonFile {
             $Object.Hostname = $Object.Hostname | ConvertTo-SecureString -AsPlainText | ConvertFrom-SecureString
             $Object.Username = $Object.Username | ConvertTo-SecureString -AsPlainText | ConvertFrom-SecureString
             $Object.Password = $Object.Password | ConvertTo-SecureString -AsPlainText | ConvertFrom-SecureString
+            $Object.Group = $Object.Group | ConvertTo-SecureString -AsPlainText | ConvertFrom-SecureString
         }
     
         $Json | ConvertTo-Json | Set-Content $Path
@@ -141,12 +145,14 @@ function Get-ComputersFromJson {
         $Hostname = $Object.Hostname | ConvertTo-SecureString
         $Username = $Object.Username | ConvertTo-SecureString
         $Password = $Object.Password | ConvertTo-SecureString
+        $Group = $Object.Group | ConvertTo-SecureString
 
         $Hostname = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Hostname))
         $Username = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Username))
         $Credential = New-Object System.Management.Automation.PsCredential($Username, $Password)
+        $Group = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Group))
 
-        $Computers.Add([Computer]::new($Hostname, $Username, $Credential))
+        $Computers.Add([Computer]::new($Hostname, $Username, $Credential, $Group))
     }
 
     return $Computers
