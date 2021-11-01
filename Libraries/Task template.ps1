@@ -52,7 +52,7 @@ foreach ($c in $IncludedComputers) {
 
 $IncludedCount = $IncludedComputers.Length
 $IgnoredCount = $IgnoredComputers.Length
-$CompletedIgnoredCount = $CompletedComputers.Length
+$CompletedIgnoredCount = ($CompletedComputers | Measure-Object).Count
 Write-Host -ForegroundColor Green "Completed task on $CompletedCount/$IncludedCount computers ($CompletedIgnoredCount already done, $IgnoredCount ignored)."
 
 Pause
