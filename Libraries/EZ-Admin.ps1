@@ -42,6 +42,19 @@ function Get-ComputerByHostname {
     Write-Warning 'Unknown hostname.'
 }
 
+function Get-ComputersInGroup {
+
+    Param(
+        [parameter(Mandatory=$true)]
+        [string]
+        $Group
+    )
+
+    return $Computers | Where-Object {
+        $_.Group -eq $Group
+    }
+}
+
 function Get-PSSessionByComputer {
 
     Param(
