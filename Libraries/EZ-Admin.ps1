@@ -1,6 +1,9 @@
 # EZ-Admin
 # You shouldn't run this script alone. Include it somewhere else instead.
 
+$ScriptPath = $MyInvocation.MyCommand.Path
+$ScriptFolderPath = (Get-Item $ScriptPath).Directory.FullName
+
 class Computer {
     [string]$Hostname
     [string]$Username
@@ -146,12 +149,19 @@ function New-EncryptedJsonFile {
 }
 
 function Get-ComputersFromJson {
-    if (!(Test-Path ./Libraries/Computers.json)) {
+
+    Param(
+        [parameter(Mandatory=$false)]
+        [String]
+        $Path = "$ScriptFolderPath\Computers.json"
+    )
+
+    if (!(Test-Path $Path)) {
         Write-Host -ForegroundColor Yellow "Couldn't find Computers.json. Did you run Encrypt JSON file?"
         Exit
     }
 
-    $Json = Get-Content ./Libraries/Computers.json | ConvertFrom-Json
+    $Json = Get-Content $Path | ConvertFrom-Json
     $Computers = New-Object System.Collections.Generic.List[Computer]
 
     foreach ($Object in $Json) {
