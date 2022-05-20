@@ -7,7 +7,7 @@ try {
 }
 
 # Enter a PowerShell Session
-# Enter-PSSessionByHostname DeviceName
+# Enter-PSSessionByName DeviceName
 
 # Run something on all computers
 $IncludedComputers = $Computers
@@ -15,11 +15,11 @@ $IncludedComputers = $Computers
 # Run something on all computers in a group
 # $IncludedComputers = Get-ComputersInGroup Group1
 
-# Ignore computers by hostname.
+# Ignore computers by name.
 # $IgnoredComputers = @()
 
 foreach ($c in $IncludedComputers) {
-    if ($IgnoredComputers -contains $c.Hostname) {
+    if ($IgnoredComputers -contains $c.Name) {
         continue
     }
 

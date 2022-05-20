@@ -13,7 +13,7 @@ $IncludedComputers = $Computers
 # Run the task on all computers in a group
 # $IncludedComputers = Get-ComputersInGroup Group1
 
-# Ignore computers by hostname.
+# Ignore computers by name.
 # $IgnoredComputers = @()
 
 # Ignore computers that have already completed this task.
@@ -27,7 +27,7 @@ $CompletedComputers = Get-Content $CompletedComputersPath
 
 $CompletedCount = 0
 foreach ($c in $IncludedComputers) {
-    if (($IgnoredComputers + $CompletedComputers) -contains $c.Hostname) {
+    if (($IgnoredComputers + $CompletedComputers) -contains $c.Name) {
         continue
     }
 
@@ -46,7 +46,7 @@ foreach ($c in $IncludedComputers) {
     #>
 
 	# Add computer to the completed list
-	Add-Content "$TaskFolderPath\Completed.txt" $c.Hostname
+	Add-Content "$TaskFolderPath\Completed.txt" $c.Name
     $CompletedCount++
 }
 

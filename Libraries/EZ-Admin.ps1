@@ -5,6 +5,7 @@ $ScriptPath = $MyInvocation.MyCommand.Path
 $ScriptFolderPath = (Get-Item $ScriptPath).Directory.FullName
 
 class Computer {
+    [string]$Name
     [string]$Hostname
     [string]$Username
     [System.Management.Automation.PSCredential]$Credential
@@ -12,11 +13,13 @@ class Computer {
     [Object]$Session
 
     Computer (
+        [string]$name,
         [string]$hostname,
         [string]$username,
         [System.Management.Automation.PSCredential]$credential,
         [string]$group
     ) {
+        $this.Name = $name
         $this.Hostname = $hostname
         $this.Username = $username
         $this.Credential = $credential
@@ -24,8 +27,25 @@ class Computer {
     }
 
     [string]ToString() {
-        return ("{0}\{1} ({2})" -f $this.Hostname, $this.Username, $this.Group)
+        return ("{0}\{1} ({2})" -f $this.Name, $this.Username, $this.Group)
     }
+}
+
+function Get-ComputerByName {
+
+    Param(
+        [parameter(Mandatory=$true)]
+        [String]
+        $Name 
+    )
+
+    foreach ($c in $Computers) {
+        if ($c.Name -eq $Name) {
+            return $c
+        }
+    }
+
+    Write-Warning 'Unknown name.'
 }
 
 function Get-ComputerByHostname {
@@ -82,6 +102,23 @@ function Get-PSSessionByComputer {
     return $Session
 }
 
+function Get-PSSessionByName {
+    
+    Param(
+        [parameter(Mandatory=$true)]
+        [String]
+        $Name 
+    )
+
+    $c = Get-ComputerByName $Name
+
+    if ($c) {
+        return Get-PSSessionByComputer $c
+    }
+
+    Write-Warning 'Unknown name.'
+}
+
 function Get-PSSessionByHostname {
     
     Param(
@@ -97,6 +134,22 @@ function Get-PSSessionByHostname {
     }
 
     Write-Warning 'Unknown hostname.'
+}
+
+function Enter-PSSessionByName {
+    
+    Param(
+        [parameter(Mandatory=$true)]
+        [String]
+        $Name 
+    )
+
+    $s = Get-PSSessionByName $Name
+    if ($null -ne $s) {
+        Enter-PSSession $s
+    } else {
+        Write-Warning "Couldn't connect to $Name."
+    }
 }
 
 function Enter-PSSessionByHostname {
@@ -129,6 +182,7 @@ function New-EncryptedJsonFile {
         $Json = $File | ConvertFrom-Json
 
         foreach ($Object in $Json) {
+            $Object.Name = $Object.Name | ConvertTo-SecureString -AsPlainText | ConvertFrom-SecureString
             $Object.Hostname = $Object.Hostname | ConvertTo-SecureString -AsPlainText | ConvertFrom-SecureString
             $Object.Username = $Object.Username | ConvertTo-SecureString -AsPlainText | ConvertFrom-SecureString
             $Object.Password = $Object.Password | ConvertTo-SecureString -AsPlainText | ConvertFrom-SecureString
@@ -165,17 +219,19 @@ function Get-ComputersFromJson {
     $Computers = New-Object System.Collections.Generic.List[Computer]
 
     foreach ($Object in $Json) {
+        $Name = $Object.Name | ConvertTo-SecureString
         $Hostname = $Object.Hostname | ConvertTo-SecureString
         $Username = $Object.Username | ConvertTo-SecureString
         $Password = $Object.Password | ConvertTo-SecureString
         $Group = $Object.Group | ConvertTo-SecureString
 
+        $Name = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Name))
         $Hostname = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Hostname))
         $Username = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Username))
         $Credential = New-Object System.Management.Automation.PsCredential($Username, $Password)
         $Group = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Group))
 
-        $Computers.Add([Computer]::new($Hostname, $Username, $Credential, $Group))
+        $Computers.Add([Computer]::new($Name, $Hostname, $Username, $Credential, $Group))
     }
 
     return $Computers

@@ -25,14 +25,18 @@ A simple PowerShell library to run PowerShell scripts on a Windows network via P
 ```json
 [
   {
-    "Hostname": "DEVICE1",
+    "Name": "DEVICE1",
+    "Hostname": "device1.company",
     "Username": "John Doe",
-    "Password": "weakpassword"
+    "Password": "weakpassword",
+    "Group": "Group1"
   },
   {
-    "Hostname": "DEVICE2",
+    "Name": "DEVICE2",
+    "Hostname": "device2.company",
     "Username": "Someone Else",
-    "Password": "EZhc96~3+$eEE3&h"
+    "Password": "EZhc96~3+$eEE3&h",
+    "Group": "Group1"
   }
 ]
 
